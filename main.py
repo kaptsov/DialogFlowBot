@@ -1,4 +1,5 @@
 import logging
+from environs import Env
 
 from telegram import __version__ as TG_VER
 
@@ -45,18 +46,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def main() -> None:
-    """Start the bot."""
-    # Create the Application and pass it your bot's token.
-    application = Application.builder().token("TELEGRAM_TOKEN").build()
 
-    # on different commands - answer in Telegram
+    env = Env()
+    env.read_env()
+
+    application = Application.builder().token(env('TELEGRAM_TOKEN')).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
-
-    # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-
-    # Run the bot until the user presses Ctrl-C
     application.run_polling()
 
 
