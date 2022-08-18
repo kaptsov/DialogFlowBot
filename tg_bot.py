@@ -1,5 +1,5 @@
 import logging
-import os
+from environs import Env
 
 import requests
 from telegram import Update, ForceReply
@@ -10,7 +10,7 @@ from telegram.ext import \
     MessageHandler,\
     Filters
 
-from .dialogflow_func import \
+from dialogflow_func import \
     get_list_intents,\
     create_intent,\
     detect_intent_texts
@@ -20,6 +20,9 @@ logging.basicConfig(
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
+
+env = Env()
+env.read_env()
 
 
 def start(update: Update, context: CallbackContext):
@@ -37,12 +40,13 @@ def help(update: Update, context: CallbackContext):
 
 
 def on_message(update: Update, context: CallbackContext):
-    text = detect_intent_texts(
-        project_id=os.environ['DIALOG_FLOW_PROJECT_ID'],
+    text, _ = detect_intent_texts(
+        project_id=env('DIALOG_FLOW_PROJECT_ID'),
         session_id=update.effective_chat.id,
         text=update.message.text,
         language_code='ru-RU'
     )
+    print(text)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
@@ -63,7 +67,7 @@ def df_train(update: Update, context: CallbackContext):
         help(update, context)
         return
 
-    project_id = os.environ['DIALOG_FLOW_PROJECT_ID']
+    project_id = env('DIALOG_FLOW_PROJECT_ID')
 
     intents_to_add = response.json()
     context.bot.send_message(chat_id=update.effective_chat.id,
@@ -91,7 +95,8 @@ def df_train(update: Update, context: CallbackContext):
 
 
 def main() -> None:
-    updater = Updater(token=os.environ['TELEGRAM_TOKEN'], use_context=True)
+
+    updater = Updater(token=env('TELEGRAM_TOKEN'), use_context=True)
     dispatcher = updater.dispatcher
 
     on_message_handler = MessageHandler(
