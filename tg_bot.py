@@ -46,14 +46,7 @@ def on_message(update: Update, context: CallbackContext):
         text=update.message.text,
         language_code='ru-RU'
     )
-    print(text)
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
-
-
-def unknown(update: Update, context: CallbackContext):
-    context.bot.send_message(chat_id=update.effective_chat.id,
-        text="Sorry, I didn't understand that command."
-    )
 
 
 def df_train(update: Update, context: CallbackContext):
@@ -105,14 +98,13 @@ def main() -> None:
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
     df_train_handler = CommandHandler('train', df_train)
-    unknown_handler = MessageHandler(Filters.command, unknown)
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
     dispatcher.add_handler(df_train_handler)
     dispatcher.add_handler(on_message_handler)
-    dispatcher.add_handler(unknown_handler)
 
+    logger.info('Polling started')
     updater.start_polling()
 
 
