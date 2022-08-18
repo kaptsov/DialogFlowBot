@@ -25,7 +25,7 @@ python tg_bot.py
 ```
 to start telegram bot.
 
-![](tg_bot.gif)
+<img height="350" src="tg_bot.gif" width="350"/>
 
 ```shell script
 python vk_bot.py 
