@@ -10,7 +10,7 @@ from telegram.ext import \
     MessageHandler,\
     Filters
 
-from dialogflow_func import \
+from dialogflow import \
     get_list_intents,\
     create_intent,\
     detect_intent_texts

@@ -4,7 +4,7 @@ import vk_api as vk
 from environs import Env
 from vk_api.longpoll import VkLongPoll, VkEventType
 
-from dialogflow_func import detect_intent_texts
+from dialogflow import detect_intent_texts
 
 
 def handle_message(event, vk_api, project_id):
