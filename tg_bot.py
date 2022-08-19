@@ -19,11 +19,6 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
-logger = logging.getLogger(__name__)
-
-env = Env()
-env.read_env()
-
 
 def start(update: Update, context: CallbackContext):
     user = update.effective_user
@@ -39,9 +34,9 @@ def help(update: Update, context: CallbackContext):
     )
 
 
-def on_message(update: Update, context: CallbackContext):
+def handle_message(update: Update, context: CallbackContext, project_id):
     text, _ = detect_intent_texts(
-        project_id=env('DIALOG_FLOW_PROJECT_ID'),
+        project_id=project_id,
         session_id=update.effective_chat.id,
         text=update.message.text,
         language_code='ru-RU'
@@ -49,7 +44,7 @@ def on_message(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
-def df_train(update: Update, context: CallbackContext):
+def df_train(update: Update, context: CallbackContext, project_id):
     if not context.args:
         help(update, context)
         return
@@ -59,8 +54,6 @@ def df_train(update: Update, context: CallbackContext):
     except requests.exceptions.MissingSchema:
         help(update, context)
         return
-
-    project_id = env('DIALOG_FLOW_PROJECT_ID')
 
     intents_to_add = response.json()
     context.bot.send_message(chat_id=update.effective_chat.id,
@@ -89,11 +82,17 @@ def df_train(update: Update, context: CallbackContext):
 
 def main() -> None:
 
+    env = Env()
+    env.read_env()
+
+    logger = logging.getLogger(__name__)
+
     updater = Updater(token=env('TELEGRAM_TOKEN'), use_context=True)
+    project_id = env('DIALOG_FLOW_PROJECT_ID')
     dispatcher = updater.dispatcher
 
-    on_message_handler = MessageHandler(
-        Filters.text & (~Filters.command), on_message
+    handle_message_handler = MessageHandler(
+        Filters.text & (~Filters.command), handle_message, project_id
     )
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
@@ -102,7 +101,7 @@ def main() -> None:
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
     dispatcher.add_handler(df_train_handler)
-    dispatcher.add_handler(on_message_handler)
+    dispatcher.add_handler(handle_message_handler)
 
     logger.info('Polling started')
     updater.start_polling()
