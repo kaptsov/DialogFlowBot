@@ -45,7 +45,7 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
     )
 
 
-def get_list_intents(project_id):
+def get_intents(project_id):
     client = IntentsClient()
     parent = AgentsClient.agent_path(project_id)
 

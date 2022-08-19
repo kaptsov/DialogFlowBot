@@ -11,7 +11,7 @@ from telegram.ext import \
     Filters
 
 from dialogflow import \
-    get_list_intents,\
+    get_intents,\
     create_intent,\
     detect_intent_texts
 
@@ -58,10 +58,10 @@ def df_train(update: Update, context: CallbackContext, project_id):
     intents_to_add = response.json()
     context.bot.send_message(chat_id=update.effective_chat.id,
                              text='Загружаем фразы в DialogFlow...')
-    list_intents = get_list_intents(project_id)
+    intents_collection = get_intents(project_id)
 
     for display_name, content in intents_to_add.items():
-        if display_name not in list_intents:
+        if display_name not in intents_collection:
             context.bot.send_message(chat_id=update.effective_chat.id,
                 text=f'Добавляем обработку "{display_name}"'
             )
