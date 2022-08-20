@@ -1,6 +1,6 @@
 import logging
 from environs import Env
-
+from functools import partial
 import requests
 from telegram import Update, ForceReply
 from telegram.ext import \
@@ -92,11 +92,15 @@ def main() -> None:
     dispatcher = updater.dispatcher
 
     handle_message_handler = MessageHandler(
-        Filters.text & (~Filters.command), handle_message, project_id
+        Filters.text & (~Filters.command),
+        partial(handle_message, project_id=project_id)
     )
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
-    df_train_handler = CommandHandler('train', df_train)
+    df_train_handler = CommandHandler(
+        'train',
+        partial(df_train, project_id=project_id)
+    )
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
