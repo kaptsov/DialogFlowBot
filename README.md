@@ -37,7 +37,14 @@ to start vkontakte bot.
 
 Dialog flow agent training by json file. Specify the path to the file.
 
-to start in telegram bot write command:
+To train the DialogFlow from script wite in terminal:
+
+```shell script
+python dialogflow.py <URL to json file with training phrases>
+```
+(So you need to pass the json file as an argument)
+
+to train DialogFlow in telegram bot write command:
 ```shell script
 /train <URL to json file with training phrases>
 ```
