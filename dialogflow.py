@@ -57,9 +57,8 @@ def get_intents(project_id):
         parent=parent,
         language_code='ru',
     )
-    list_intents = []
-    for response in client.list_intents(request=request):
-        list_intents.append(response.display_name)
+    list_intents = [response.display_name for response in client.list_intents(request=request)]
+
     return list_intents
 
 
