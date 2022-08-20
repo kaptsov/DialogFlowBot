@@ -1,18 +1,19 @@
 import logging
-from environs import Env
 from functools import partial
+
 import requests
+from environs import Env
 from telegram import Update, ForceReply
 from telegram.ext import \
-    Updater,\
-    CallbackContext,\
-    CommandHandler,\
-    MessageHandler,\
+    Updater, \
+    CallbackContext, \
+    CommandHandler, \
+    MessageHandler, \
     Filters
 
 from dialogflow import \
-    get_intents,\
-    create_intent,\
+    get_intents, \
+    create_intent, \
     detect_intent_texts
 
 logging.basicConfig(
