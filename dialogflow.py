@@ -1,3 +1,7 @@
+import json
+from argparse import ArgumentParser
+
+from environs import Env
 from google.cloud.dialogflow import (
     SessionsClient, TextInput, QueryInput,
     IntentsClient, AgentsClient, Intent, ListIntentsRequest
@@ -57,3 +61,38 @@ def get_intents(project_id):
     for response in client.list_intents(request=request):
         list_intents.append(response.display_name)
     return list_intents
+
+
+def main():
+    env = Env()
+    env.read_env()
+
+    parser = ArgumentParser()
+    parser.add_argument('path_to_json', help='Полный путь к json файлу')
+    args = parser.parse_args()
+
+    project_id = env('DIALOG_FLOW_PROJECT_ID')
+
+    with open(args.path_to_json, 'r', encoding='utf-8') as intents_file:
+        intents_to_add = json.load(intents_file)
+
+    print('Загружаем фразы в DialogFlow...')
+    intents_collection = get_intents(project_id)
+
+    for display_name, content in intents_to_add.items():
+        if display_name not in intents_collection:
+            print(f'Добавляем обработку "{display_name}"')
+            create_intent(
+                project_id=project_id,
+                display_name=display_name,
+                training_phrases_parts=content['questions'],
+                message_texts=content['answer'],
+            )
+
+        else:
+            print(f'Обработка "{display_name}" уже существует')
+    print('Загружено')
+
+
+if __name__ == '__main__':
+    main()
