@@ -16,7 +16,7 @@ from dialogflow import detect_intent_texts
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update):
+def start(update: Update, context: CallbackContext):
     user = update.effective_user
     update.message.reply_html(
         rf"Здравствуйте, {user.mention_html()}! Давайте пообщаемся.",
