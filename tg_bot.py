@@ -16,10 +16,9 @@ from dialogflow import \
     create_intent, \
     detect_intent_texts
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO
-)
+
+logger = logging.getLogger(__name__)
+
 
 def start(update: Update, context: CallbackContext):
     user = update.effective_user
@@ -86,7 +85,10 @@ def main() -> None:
     env = Env()
     env.read_env()
 
-    logger = logging.getLogger(__name__)
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO
+    )
 
     updater = Updater(token=env('TELEGRAM_TOKEN'), use_context=True)
     project_id = env('DIALOG_FLOW_PROJECT_ID')
