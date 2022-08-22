@@ -44,10 +44,6 @@ python dialogflow.py <URL to json file with training phrases>
 ```
 (So you need to pass the json file as an argument)
 
-to train DialogFlow in telegram bot write command:
-```shell script
-/train <URL to json file with training phrases>
-```
 Example content of training phrases, json file:
 
 ```{
