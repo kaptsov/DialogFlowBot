@@ -1,7 +1,6 @@
 import logging
 from functools import partial
 
-import requests
 from environs import Env
 from telegram import Update, ForceReply
 from telegram.ext import \
@@ -11,16 +10,13 @@ from telegram.ext import \
     MessageHandler, \
     Filters
 
-from dialogflow import \
-    get_intents, \
-    create_intent, \
-    detect_intent_texts
+from dialogflow import detect_intent_texts
 
 
 logger = logging.getLogger(__name__)
 
 
-def start(update: Update, context: CallbackContext):
+def start(update: Update):
     user = update.effective_user
     update.message.reply_html(
         rf"Здравствуйте, {user.mention_html()}! Давайте пообщаемся.",
@@ -44,42 +40,6 @@ def handle_message(update: Update, context: CallbackContext, project_id):
     context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
 
-def df_train(update: Update, context: CallbackContext, project_id):
-    if not context.args:
-        help(update, context)
-        return
-    try:
-        response = requests.get(context.args[0])
-        response.raise_for_status()
-    except requests.exceptions.MissingSchema:
-        help(update, context)
-        return
-
-    intents_to_add = response.json()
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text='Загружаем фразы в DialogFlow...')
-    intents_collection = get_intents(project_id)
-
-    for display_name, content in intents_to_add.items():
-        if display_name not in intents_collection:
-            context.bot.send_message(chat_id=update.effective_chat.id,
-                text=f'Добавляем обработку "{display_name}"'
-            )
-            create_intent(
-                project_id=project_id,
-                display_name=display_name,
-                training_phrases_parts=content['questions'],
-                message_texts=content['answer'],
-            )
-
-        else:
-            context.bot.send_message(chat_id=update.effective_chat.id,
-                text=f'Обработка "{display_name}" уже существует'
-            )
-    context.bot.send_message(chat_id=update.effective_chat.id,
-                             text='Загружено')
-
-
 def main() -> None:
 
     env = Env()
@@ -100,14 +60,9 @@ def main() -> None:
     )
     start_handler = CommandHandler('start', start)
     help_handler = CommandHandler('help', help)
-    df_train_handler = CommandHandler(
-        'train',
-        partial(df_train, project_id=project_id)
-    )
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
-    dispatcher.add_handler(df_train_handler)
     dispatcher.add_handler(handle_message_handler)
 
     logger.info('Polling started')
